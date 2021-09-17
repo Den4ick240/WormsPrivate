@@ -1,12 +1,19 @@
 ﻿using System;
+using System.Xml;
 
 namespace Worms
 {
     public class Point
     {
-        public int X { get; init; }
-        public int Y { get; init; }
+        public int X { get; }
+        public int Y { get; }
 
+        public Point(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+        
         public Point Move(Direction direction)
         {
             int x = X, y = Y;
@@ -24,9 +31,11 @@ namespace Worms
                 case Direction.Right:
                     x++;
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
             }
 
-            return new Point {X = x, Y = y};
+            return new Point(x, y);
         }
 
         private bool Equals(Point other)
@@ -45,6 +54,11 @@ namespace Worms
         public override int GetHashCode()
         {
             return HashCode.Combine(X, Y);
+        }
+
+        public int Distance(Point other)
+        {
+            return Math.Abs(X - other.X) + Math.Abs(Y - other.Y);
         }
     }
 }

@@ -1,32 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Worms.abstractions;
+using Worms.entities;
 
 namespace Worms
 {
     public class Simulator
     {
-        private readonly WormFactory _wormFactory;
-        private readonly FoodFactory _foodFactory;
+        private readonly IWormFactory _wormFactory;
         private readonly IFoodGenerator _foodGenerator;
-        private readonly List<AbstractWorm> _worms;
+        private readonly List<Worm> _worms;
         private readonly List<Food> _foods;
         private readonly World _world;
-        private readonly Logger _logger;
+        private readonly ILogger _logger;
+        private readonly IWormBehaviour _wormBehaviour;
 
-        public Simulator(WormFactory wormFactory, FoodFactory foodFactory, IFoodGenerator foodGenerator, Logger logger)
+        public Simulator(
+            IWormFactory wormFactory,
+            IFoodGenerator foodGenerator,
+            ILogger logger,
+            IWormBehaviour wormBehaviour
+        )
         {
             _wormFactory = wormFactory;
-            _foodFactory = foodFactory;
             _foodGenerator = foodGenerator;
-            _worms = new List<AbstractWorm>();
+            _logger = logger;
+            _wormBehaviour = wormBehaviour;
+            _worms = new List<Worm>();
             _foods = new List<Food>();
             _world = new World {Worms = _worms, Foods = _foods};
-            _logger = logger;
-            _worms.Add(wormFactory.GetWorm(new Point {X = 0, Y = 0}));
+            _worms.Add(wormFactory.GetWorm(new Point(0, 0)));
         }
 
-        private void RunFrame()
+        public Simulator(
+            IWormFactory wormFactory,
+            IFoodGenerator foodGenerator,
+            ILogger logger,
+            IWormBehaviour wormBehaviour,
+            World world
+        )
+        {
+            _wormFactory = wormFactory;
+            _foodGenerator = foodGenerator;
+            _logger = logger;
+            _wormBehaviour = wormBehaviour;
+            _worms = world.Worms;
+            _foods = world.Foods;
+            _world = world;
+        }
+
+        public void RunFrame()
         {
             GenerateFood();
             _logger.Log(_world);
@@ -55,6 +79,7 @@ namespace Worms
             {
                 food.Age();
             }
+
             _foods.RemoveAll(food => food.IsExpired());
         }
 
@@ -63,14 +88,15 @@ namespace Worms
             var newWormPoints = new List<Point>();
             foreach (var worm in _worms)
             {
-                var action = worm.GetAction(_world);
+                var action = _wormBehaviour.GetAction(_world, worm);
                 Console.WriteLine(worm.Name + " wants to " + action);
                 action.perform(_world, worm, newWormPoints);
                 worm.Age();
             }
+
             foreach (var newWormPoint in newWormPoints)
             {
-               _worms.Add(_wormFactory.GetWorm(newWormPoint)); 
+                _worms.Add(_wormFactory.GetWorm(newWormPoint));
             }
         }
 
@@ -81,32 +107,19 @@ namespace Worms
 
         private void GenerateFood()
         {
-            while (true)
+            foreach (var food in _foodGenerator.GenerateFood(_world))
             {
-                Console.WriteLine("Trying to generate food...");
-                var foodPoint = _foodGenerator.GetFoodPoint();
-                if (_foods.Find(food => food.Point.Equals(foodPoint)) != null) continue;
-                PlaceFood(_foodFactory.GetFood(foodPoint));
-                Console.WriteLine("Food generated");
-                return;
+                PlaceFood(food);
             }
         }
 
         private void PlaceFood(Food food)
         {
             var worm = _worms.Find(worm => worm.Point.Equals(food.Point));
-            worm?.Feed(food.FeedingPoints);
-            _foods.Add(food);
-        }
-
-        public void Run()
-        {
-            for (var i = 0; i < 100; i++)
-            {
-                Thread.Sleep(10);
-                    Console.WriteLine("Simulator iteration: " + i);
-                RunFrame();
-            }
+            if (worm == null)
+                _foods.Add(food);
+            else
+                worm.Feed(food.FeedingPoints);
         }
     }
 }

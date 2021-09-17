@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Worms.abstractions;
+using Worms.entities;
 
 namespace Worms
 {
-    public class Logger
+    public class Logger : ILogger
     {
         private readonly TextWriter _writer;
 
@@ -24,7 +26,7 @@ namespace Worms
             _writer.WriteLine(line);
         }
 
-        private string GetWormsLog(List<AbstractWorm> worms)
+        private string GetWormsLog(List<Worm> worms)
         {
             return "Worms:[" +
                    string.Join(",",

@@ -1,24 +1,30 @@
 ﻿using System.Collections.Generic;
+using Worms.abstractions;
+using Worms.entities;
 
 namespace Worms
 {
-    public interface IWormAction
-    {
-        void perform(World world, AbstractWorm worm, List<Point> newWormPoints);
-    }
-
     public class DoNothingAction : IWormAction
     {
-        public void perform(World world, AbstractWorm worm, List<Point> newWormPoints)
+        public void perform(World world, Worm worm, List<Point> newWormPoints)
         {
         }
     }
 
     public class MoveAction : IWormAction
     {
+        public MoveAction()
+        {
+        }
+
+        public MoveAction(Direction direction)
+        {
+            Direction = direction;
+        }
+
         public Direction Direction { init; get; }
 
-        public void perform(World world, AbstractWorm worm, List<Point> newWormPoints)
+        public void perform(World world, Worm worm, List<Point> newWormPoints)
         {
             var newPoint = worm.Point.Move(Direction);
             if (world.Worms.Find(worm => worm.Point.Equals(newPoint)) == null)
@@ -35,7 +41,7 @@ namespace Worms
     {
         public Direction Direction { init; get; }
 
-        public void perform(World world, AbstractWorm worm, List<Point> newWormPoints)
+        public void perform(World world, Worm worm, List<Point> newWormPoints)
         {
             var newPoint = worm.Point.Move(Direction);
             var freeFromWorms = world.Worms.Find(worm => worm.Point.Equals(newPoint)) == null;
