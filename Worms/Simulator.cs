@@ -55,9 +55,13 @@ namespace Worms
             GenerateFood();
             _logger.Log(_world);
             MoveWorms();
+            Console.WriteLine("worms moved");
             FeedWorms();
+            Console.WriteLine("worms fed");
             AgeFoods();
+            Console.WriteLine("foods aged");
             DeleteDeadWorms();
+            Console.WriteLine("dead worms burried");
         }
 
         private void FeedWorms()
@@ -93,7 +97,6 @@ namespace Worms
                 action.perform(_world, worm, newWormPoints);
                 worm.Age();
             }
-
             foreach (var newWormPoint in newWormPoints)
             {
                 _worms.Add(_wormFactory.GetWorm(newWormPoint));

@@ -26,7 +26,7 @@ namespace Worms
             _writer.WriteLine(line);
         }
 
-        private string GetWormsLog(List<Worm> worms)
+        private static string GetWormsLog(IEnumerable<Worm> worms)
         {
             return "Worms:[" +
                    string.Join(",",
@@ -36,7 +36,7 @@ namespace Worms
                    ) + "]";
         }
 
-        private string GetFoodsLog(List<Food> foods)
+        private static string GetFoodsLog(IEnumerable<Food> foods)
         {
             return "Foods: [" +
                    string.Join(",",

@@ -32,7 +32,7 @@ namespace Worms
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _appLifetime.ApplicationStarted.Register(() =>
-                Task.Run(async () =>
+                Task.Run(async () =>        
                 {
                     RunSimulator();
                     _appLifetime.StopApplication();

@@ -46,7 +46,8 @@ namespace Worms
             var newPoint = worm.Point.Move(Direction);
             var freeFromWorms = world.Worms.Find(worm => worm.Point.Equals(newPoint)) == null;
             var free = freeFromWorms &&
-                       world.Foods.Find(food => food.Point.Equals(newPoint)) == null;
+                       world.Foods.Find(food => food.Point.Equals(newPoint)) == null &&
+                       newWormPoints.Find(point => point.Equals(newPoint)) == null;
             if (free)
             {
                 newWormPoints.Add(newPoint);
