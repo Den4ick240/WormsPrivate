@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -36,7 +35,7 @@ namespace Worms
                 {
                     RunSimulator();
                     _appLifetime.StopApplication();
-                }));
+                }, cancellationToken));
             return Task.CompletedTask;
         }
 

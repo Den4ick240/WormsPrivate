@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using Worms.abstractions;
 using Worms.entities;
 
@@ -61,7 +60,7 @@ namespace Worms
             AgeFoods();
             Console.WriteLine("foods aged");
             DeleteDeadWorms();
-            Console.WriteLine("dead worms burried");
+            Console.WriteLine("dead worms buried");
         }
 
         private void FeedWorms()
