@@ -55,7 +55,6 @@ namespace Worms
             
             for (var i = 0; i < 100; i++)
             {
-                // Thread.Sleep(10);
                 Console.WriteLine("Simulator iteration: " + i);
                 sim.RunFrame();
             }

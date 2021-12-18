@@ -121,7 +121,12 @@ namespace Worms
             if (worm == null)
                 _foods.Add(food);
             else
+            {
+                Console.WriteLine("Feeding");
+                Console.WriteLine(worm.Ttl);
                 worm.Feed(food.FeedingPoints);
+                Console.WriteLine(worm.Ttl);
+            }
         }
     }
 }
