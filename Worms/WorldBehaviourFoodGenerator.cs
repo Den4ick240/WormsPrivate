@@ -2,6 +2,7 @@
 using System.Linq;
 using Worms.abstractions;
 using Worms.database.entities;
+using Worms.entities;
 
 namespace Worms
 {

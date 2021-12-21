@@ -1,4 +1,4 @@
-﻿namespace Worms.abstractions
+﻿namespace Worms.entities
 {
     public class Food
     {

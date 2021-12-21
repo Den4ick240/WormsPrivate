@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Xml;
 
-namespace Worms
+namespace Worms.entities
 {
     public class Point
     {

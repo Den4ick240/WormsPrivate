@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,9 +29,10 @@ namespace Worms
         {
             if (args.Length < 2)
             {
+                string worldBehaviourName = (args.Length > 0 ? args[0] : null);
                 CreateHostBuilder(args,
-                        args.Length > 0,
-                        args[0])
+                        worldBehaviourName != null,
+                        worldBehaviourName)
                     .Build()
                     .Run();
             }
@@ -43,6 +46,10 @@ namespace Worms
         private static void GenerateWorldBehaviour(DatabaseContext dbCtx, string behaviourName)
         {
             var worldBehaviour = new WorldBehaviourGenerator().Generate(behaviourName, NormalFoodGenerator);
+            dbCtx.WorldBehaviours.RemoveRange(
+                dbCtx.WorldBehaviours.Where(
+                    b => b.Name == behaviourName
+                ));
             dbCtx.Add(worldBehaviour);
             dbCtx.SaveChanges();
         }
@@ -71,12 +78,13 @@ namespace Worms
                         services
                             .AddSingleton<IFoodGenerator>(_ => NormalFoodGenerator);
                     services
+                        .AddScoped<HttpClient>()
+                        .AddScoped<ActionFactory>()
                         .AddScoped<TextWriter>(_ => new StreamWriter(LogFileName))
                         .AddHostedService<SimulatorService>()
                         .AddSingleton<ILogger, Logger>()
                         .AddSingleton<INameGenerator, JohnsNameGenerator>()
-                        .AddSingleton<IWormBehaviour, ClosestFoodWormBehaviour>(_ =>
-                            new ClosestFoodWormBehaviour(new ActionFactory()));
+                        .AddSingleton<IWormBehaviour, WebWormBehaviour>();
                 });
         }
     }

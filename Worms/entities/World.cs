@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Worms.abstractions;
-using Worms.entities;
+﻿using System.Collections.Generic;
 
-namespace Worms
+namespace Worms.entities
 {
     public class World
     {

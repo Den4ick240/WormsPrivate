@@ -8,7 +8,7 @@ namespace Worms.UnitTests
     public class ReproduceActionTest
     {
         private readonly IWormFactory _wormFactory = new WormFactory(10, new JohnsNameGenerator(""));
-        private const Direction Direction = Worms.Direction.Down;
+        private const Direction Direction = entities.Direction.Down;
         private const string firstWormName = "1";
         private const string secondWormName = "2";
 

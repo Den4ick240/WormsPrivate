@@ -1,4 +1,6 @@
-﻿namespace Worms.abstractions
+﻿using Worms.entities;
+
+namespace Worms.abstractions
 {
     public interface ILogger
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Worms.abstractions;
 using Worms.entities;
 
@@ -127,6 +128,11 @@ namespace Worms
                 worm.Feed(food.FeedingPoints);
                 Console.WriteLine(worm.Ttl);
             }
+        }
+
+        public int GetWormCount()
+        {
+            return _world.Worms.Count;
         }
     }
 }

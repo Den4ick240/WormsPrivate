@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Worms.abstractions;
+using Worms.entities;
 
 namespace Worms
 {

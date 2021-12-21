@@ -52,12 +52,22 @@ namespace Worms
                 _logger,
                 _wormBehaviour
             );
-            
+
             for (var i = 0; i < 100; i++)
             {
                 Console.WriteLine("Simulator iteration: " + i);
-                sim.RunFrame();
+                try
+                {
+
+                    sim.RunFrame();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
+
+            Console.WriteLine(sim.GetWormCount());
         }
     }
 }

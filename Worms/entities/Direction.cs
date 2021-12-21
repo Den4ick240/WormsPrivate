@@ -1,4 +1,4 @@
-﻿namespace Worms
+﻿namespace Worms.entities
 {
     public enum Direction
     {
