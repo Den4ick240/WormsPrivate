@@ -7,15 +7,20 @@ namespace Worms.Web.Behaviour
 {
     public class OptimizedWormBehaviour : AbstractWormBehaviour
     {
+        private const int TotalSteps = 100;
+        private const int LifeStrengthToSplit = 11;
+
         protected override Response GetResponse(WorldState worldState, Worm worm, int run, int step)
         {
-            var stepsLeft = 100 - step;
-            if (stepsLeft + 11 < worm.LifeStrength && stepsLeft < 10)
+            var stepsLeftUntilEnd = TotalSteps - step;
+            var wontDieUntilEndIfSplit = stepsLeftUntilEnd + LifeStrengthToSplit < worm.LifeStrength;
+            var childWontDieUntilEndIfSplit = stepsLeftUntilEnd < 10;
+            if (wontDieUntilEndIfSplit && childWontDieUntilEndIfSplit)
             {
-                var directionToSplit = FindFreeDirection(worldState, worm.Position, Direction.UP);
-                if (directionToSplit != null) return new Response(directionToSplit.GetValueOrDefault(), true);
+                var freeDirectionToSplit = FindFreeDirection(worldState, worm.Position);
+                if (freeDirectionToSplit != null) return new Response(freeDirectionToSplit.GetValueOrDefault(), true);
             }
-            
+
             List<(Worm worm, List<(int dist, Food food)> availableFoods)>
                 wormsWithFoods =
                     worldState.Worms.Select(worldStateWorm =>
@@ -91,10 +96,10 @@ namespace Worms.Web.Behaviour
             return new Response(direction);
         }
 
-        private static Direction? FindFreeDirection(WorldState worldState, Position position, Direction direction)
+        private static Direction? FindFreeDirection(WorldState worldState, Position position, Direction directionToAvoid = Direction.UP)
         {
             var dirs = new[] {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
-            var i = Array.FindIndex(dirs, d => d.Equals(direction));
+            var i = Array.FindIndex(dirs, d => d.Equals(directionToAvoid));
             for (var j = (i + 1) % 4; j != i; j = (j + 1) % 4)
             {
                 var pos = DirectionUtils.MovePositionToDirection(position, dirs[j]);
