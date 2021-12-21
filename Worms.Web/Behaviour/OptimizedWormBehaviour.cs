@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Localization;
 using Worms.Domain;
 
 namespace Worms.Web.Behaviour
@@ -24,8 +25,10 @@ namespace Worms.Web.Behaviour
             List<(Worm worm, List<(int dist, Food food)> availableFoods)>
                 wormsWithFoods =
                     worldState.Worms.Select(worldStateWorm =>
-                        (worldStateWorm,
-                            FindAvailableFoods(worldState, worldStateWorm.Position, worldStateWorm.LifeStrength))
+                        (
+                            worldStateWorm,
+                            FindAvailableFoods(worldState, worldStateWorm.Position, worldStateWorm.LifeStrength)
+                        )
                     ).ToList();
 
             for (var i = -1; i < wormsWithFoods.Count - 1; i++)
@@ -96,16 +99,23 @@ namespace Worms.Web.Behaviour
             return new Response(direction);
         }
 
-        private static Direction? FindFreeDirection(WorldState worldState, Position position, Direction directionToAvoid = Direction.UP)
+        private static Direction? FindFreeDirection(WorldState worldState, Position position,
+            Direction directionToAvoid = Direction.UP)
         {
-            var dirs = new[] {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
-            var i = Array.FindIndex(dirs, d => d.Equals(directionToAvoid));
-            for (var j = (i + 1) % 4; j != i; j = (j + 1) % 4)
+            var directionArray = new[] {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
+
+            //You might not want to split to direction which you are going to go on the next step, because the child might get in the way
+            //so we try to split to another direction, if possible
+            var directionIndexToAvoid = Array.FindIndex(directionArray, d => d.Equals(directionToAvoid));
+
+            for (var i = (directionIndexToAvoid + 1) % 4; i != directionIndexToAvoid; i = (i + 1) % 4)
             {
-                var pos = DirectionUtils.MovePositionToDirection(position, dirs[j]);
-                if (!worldState.IsFoodOnPosition(pos) && !worldState.IsWormOnPosition(pos))
+                var currentDirection = directionArray[i];
+                var positionMovedToDirection = DirectionUtils.MovePositionToDirection(position, currentDirection);
+                if (!worldState.IsFoodOnPosition(positionMovedToDirection) &&
+                    !worldState.IsWormOnPosition(positionMovedToDirection))
                 {
-                    return dirs[j];
+                    return currentDirection;
                 }
             }
 
