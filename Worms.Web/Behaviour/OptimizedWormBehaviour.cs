@@ -18,18 +18,17 @@ namespace Worms.Web.Behaviour
             var childWontDieUntilEndIfSplit = stepsLeftUntilEnd < 10;
             if (wontDieUntilEndIfSplit && childWontDieUntilEndIfSplit)
             {
-                var freeDirectionToSplit = FindFreeDirection(worldState, worm.Position);
+                var freeDirectionToSplit = FindFreeDirectionToSplit(worldState, worm.Position);
                 if (freeDirectionToSplit != null) return new Response(freeDirectionToSplit.GetValueOrDefault(), true);
             }
 
-            List<(Worm worm, List<(int dist, Food food)> availableFoods)>
-                wormsWithFoods =
-                    worldState.Worms.Select(worldStateWorm =>
-                        (
-                            worldStateWorm,
-                            FindAvailableFoods(worldState, worldStateWorm.Position, worldStateWorm.LifeStrength)
-                        )
-                    ).ToList();
+            List<(Worm worm, List<(int dist, Food food)> availableFoods)> wormsWithFoods =
+                worldState.Worms.Select(worldStateWorm =>
+                    (
+                        worldStateWorm,
+                        FindAvailableFoodsWithDistance(worldState, worldStateWorm.Position, worldStateWorm.LifeStrength)
+                    )
+                ).ToList();
 
             for (var i = -1; i < wormsWithFoods.Count - 1; i++)
             {
@@ -90,7 +89,7 @@ namespace Worms.Web.Behaviour
 
             if (worm.LifeStrength > 40 + availableFoods[0].dist)
             {
-                var splitDirection = FindFreeDirection(worldState, worm.Position, direction);
+                var splitDirection = FindFreeDirectionToSplit(worldState, worm.Position, direction);
                 if (splitDirection != null)
                     return new Response(DirectionUtils.GetOpposite(splitDirection.GetValueOrDefault()), true);
             }
@@ -99,7 +98,7 @@ namespace Worms.Web.Behaviour
             return new Response(direction);
         }
 
-        private static Direction? FindFreeDirection(WorldState worldState, Position position,
+        private static Direction? FindFreeDirectionToSplit(WorldState worldState, Position position,
             Direction directionToAvoid = Direction.UP)
         {
             var directionArray = new[] {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
@@ -119,23 +118,24 @@ namespace Worms.Web.Behaviour
                 }
             }
 
+            //null means there's no direction that you can split to
             return null;
         }
 
-        private static List<(int, Food)> FindAvailableFoods(
+        private static List<(int, Food)> FindAvailableFoodsWithDistance(
             WorldState worldState,
             Position wormPosition,
             int wormLifeStrength)
         {
-            var list = (
+            var result = (
                     from food in worldState.Food
-                    let dist = food.Position.Distance(wormPosition)
-                    where dist < wormLifeStrength && dist < food.ExpiresIn
-                    select (dist, food)
+                    let distance = food.Position.Distance(wormPosition)
+                    where distance < wormLifeStrength && distance < food.ExpiresIn
+                    select (distance, food)
                 )
                 .ToList();
-            list.Sort((a, b) => a.dist - b.dist);
-            return list;
+            result.Sort((a, b) => a.distance - b.distance);
+            return result;
         }
     }
 }
