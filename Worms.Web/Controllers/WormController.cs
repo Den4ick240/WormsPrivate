@@ -22,14 +22,7 @@ namespace Worms.Web.Controllers
         public object Post([FromBody] WorldState worldState, string name, int step, int run)
         {
             var response = _behaviour.GetResponse(worldState, name, run, step);
-            Console.WriteLine(response.Direction.ToString());
-            if (response.Direction == null)
-                return new Empty();
-            return response;
+            return response.Direction == null ? null : response;
         }
-    }
-
-    public class Empty
-    {
     }
 }
