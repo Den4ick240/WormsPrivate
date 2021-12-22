@@ -37,30 +37,41 @@ namespace Worms.Web.Behaviour
                 {
                     updated = false;
                     List<Food> highlyDemandedFoods = (
-                        from wormWithFood in (i > 1
-                            ? wormsWithFoods.GetRange(i - 1, wormsWithFoods.Count - i)
-                            : wormsWithFoods)
+                        from wormWithFood in
+                            i > 1
+                                ? wormsWithFoods.GetRange(i - 1, wormsWithFoods.Count - i)
+                                : wormsWithFoods
                         where wormWithFood.availableFoods.Count == 1
                         select wormWithFood.availableFoods[0].food
                     ).ToList();
 
+
                     foreach (var highlyDemandedFood in highlyDemandedFoods)
                     {
+                        // var min = wormsWithFoods
+                            // .Where(wormWithFood =>
+                                // wormWithFood.availableFoods.Count == 1 &&
+                                // wormWithFood.availableFoods[0].food.Equals(highlyDemandedFood))
+                            // .Min(wormWithFood => wormWithFood.worm.LifeStrength);
+
                         var wormsWithManyAvailableFoods =
-                            wormsWithFoods.Where(wormWithFood => wormWithFood.availableFoods.Count > 1);
+                            wormsWithFoods.Where(wormWithFood => wormWithFood.availableFoods.Count > 1 
+                                                                 // || wormWithFood.worm.LifeStrength > min
+                                                                 );
                         updated = wormsWithManyAvailableFoods
                             .Aggregate(updated,
                                 (current, wormWithFood) =>
                                     current && 0 !=
                                     wormWithFood.availableFoods.RemoveAll(p => p.food.Equals(highlyDemandedFood)));
                     }
-
-                    if (i < 0) continue;
-
-                    var end = wormsWithFoods[i].availableFoods.Count - 1;
-                    if (end >= 1)
-                        wormsWithFoods[i].availableFoods.RemoveRange(1, end);
                 }
+
+
+                if (i < 0) continue;
+
+                var end = wormsWithFoods[i].availableFoods.Count - 1;
+                if (end >= 1)
+                    wormsWithFoods[i].availableFoods.RemoveRange(1, end);
             }
 
             var directionToPosition = DirectionUtils.GetDirectionToPosition(worm.Position, new Position {X = 0, Y = 0});
@@ -87,7 +98,7 @@ namespace Worms.Web.Behaviour
             );
 
 
-            if (worm.LifeStrength > 40 + availableFoods[0].dist)
+            if (worm.LifeStrength > 50 + availableFoods[0].dist)
             {
                 var splitDirection = FindFreeDirectionToSplit(worldState, worm.Position, direction);
                 if (splitDirection != null)

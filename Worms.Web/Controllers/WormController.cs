@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Worms.Domain;
 using Worms.Web.Behaviour;
 
@@ -22,7 +21,7 @@ namespace Worms.Web.Controllers
         public object Post([FromBody] WorldState worldState, string name, int step, int run)
         {
             var response = _behaviour.GetResponse(worldState, name, run, step);
-            return response.Direction == null ? null : response;
+            return response.Direction == null ? "null" : response;
         }
     }
 }
